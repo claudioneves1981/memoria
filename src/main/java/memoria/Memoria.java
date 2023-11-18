@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
 
 public class Memoria {
 
@@ -15,7 +16,8 @@ public class Memoria {
     static JButton botaoMenu = new JButton("Menu");
     static JFrame frame = new JFrame();
     static List<Integer> cartas;
-    static List<JButton> botoesAbertos;
+    static List<JButton> botoesAbertos = new ArrayList<>();
+    static List<JLabel> labelsAbertos = new ArrayList<>();
     static int paresEncontrados;
 
 
@@ -61,15 +63,42 @@ public class Memoria {
         frame.setSize(600, 600);
         frame.setLayout(new GridLayout(5, 4));
 
+
+
         for (Integer carta : cartas) {
             JButton botao = new JButton();
-            botao.setText(String.valueOf(carta));
-            botao.addActionListener(new BotaoListener());
+            JLabel label = new JLabel();
+            label.setText(String.valueOf(carta));
+            label.setVisible(false);
+            botao.add(label);
+            botao.addActionListener(new BotaoListener(label));
             frame.add(botao);
 
         }
 
         frame.add(botaoMenu);
+
+        JLabel contagem = new JLabel();
+        contagem.setFont(new Font("Tahoma", Font.BOLD, 32));
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            int i = 80;
+            @Override
+            public void run() {
+                contagem.setText(" "+i);
+                i--;
+
+                if(i<0){
+                    timer.cancel();
+                    contagem.setText("Game Over");
+                    JOptionPane.showMessageDialog(null, "Tempo Esgotado");
+                    menu();
+                }
+            }
+        },0,1000);
+        frame.add(contagem);
 
 
 
@@ -94,13 +123,38 @@ public class Memoria {
 
         for (Integer carta : cartas) {
             JButton botao = new JButton();
-            botao.setText(String.valueOf(carta));
-            botao.addActionListener(new BotaoListener());
+            JLabel label = new JLabel();
+            label.setText(String.valueOf(carta));
+            label.setVisible(false);
+            botao.add(label);
+            botao.addActionListener(new BotaoListener(label));
             frame.add(botao);
 
         }
 
         frame.add(botaoMenu);
+        JLabel contagem = new JLabel();
+        contagem.setFont(new Font("Tahoma",Font.BOLD, 32));
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            int i = 70;
+            @Override
+            public void run() {
+                contagem.setText(" "+i);
+                i--;
+
+                if(i<0){
+                    timer.cancel();
+
+                    contagem.setText("Game Over");
+                    JOptionPane.showMessageDialog(null, "Tempo Esgotado");
+                    menu();
+                }
+            }
+        },0,1000);
+        frame.add(contagem);
 
 
     }
@@ -124,30 +178,66 @@ public class Memoria {
 
         for (Integer carta : cartas) {
             JButton botao = new JButton();
-            botao.setText(String.valueOf(carta));
-            botao.addActionListener(new BotaoListener());
+            JLabel label = new JLabel();
+            label.setText(String.valueOf(carta));
+            label.setVisible(false);
+            botao.add(label);
+            botao.addActionListener(new BotaoListener(label));
             frame.add(botao);
         }
 
         frame.add(botaoMenu);
+        JLabel contagem = new JLabel();
+        contagem.setFont(new Font("Tahoma",Font.BOLD, 32));
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            int i = 60;
+            @Override
+            public void run() {
+                contagem.setText(" "+i);
+                i--;
+
+                if(i<0){
+                    timer.cancel();
+
+                    contagem.setText("Game Over");
+                    JOptionPane.showMessageDialog(null, "Tempo Esgotado");
+                    menu();
+                }
+            }
+        },0,1000);
+        frame.add(contagem);
 
     }
 
     private static class BotaoListener implements ActionListener {
+
+        private final JLabel label;
+
+        public BotaoListener(JLabel label){
+            this.label = label;
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             JButton botao = (JButton) e.getSource();
 
-            if (!botoesAbertos.contains(botao)) {
-                botao.setText(String.valueOf(cartas.get(botoesAbertos.size())));
+            if (!labelsAbertos.contains(this.label)) {
+                labelsAbertos.add(this.label);
                 botoesAbertos.add(botao);
 
                 if (botoesAbertos.size() == 2) {
-                    if (botoesAbertos.get(0).getText().equals(botoesAbertos.get(1).getText())) {
+                    if (labelsAbertos.get(0).getText().equals(labelsAbertos.get(1).getText())){
+                        botoesAbertos.get(0).setFont(new Font("Arial", Font.BOLD, 32));
+                        botoesAbertos.get(1).setFont(new Font("Arial", Font.BOLD, 32));
+                        botoesAbertos.get(0).setText(this.label.getText());
+                        botoesAbertos.get(1).setText(this.label.getText());
                         paresEncontrados++;
                         if (paresEncontrados == cartas.size() / 2) {
                             JOptionPane.showMessageDialog(null, "Parabéns! Você encontrou todos os pares!");
-                            System.exit(0);
+                            menu();
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "As cartas não são iguais. Tente novamente!");
@@ -157,6 +247,7 @@ public class Memoria {
                     }
 
                     botoesAbertos.clear();
+                    labelsAbertos.clear();
                 }
             }
         }
